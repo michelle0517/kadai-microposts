@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :require_user_logged_in, only: [:index, :show, :followings, :followers]
+  before_action :require_user_logged_in, only: [:index, :show, :followings, :followers, :likes]
   
   def index
     @pagy, @users = pagy(User.order(id: :desc), items: 25)
@@ -7,8 +7,9 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
-    @pagy, @microposts = pagy(@user.microposts.order(id: :desc))
+    @pagy, @microposts= pagy(@user.microposts.order(id: :desc))
     counts(@user)
+    
   end
 
   def new
@@ -26,17 +27,27 @@ class UsersController < ApplicationController
       render :new
     end
   end
+ 
+ 
+  def followers #フォロワー一覧表示
+    @user = User.find(params[:id])
+    @pagy, @followers = pagy(@user.followers)
+    counts(@user)
+  end
   
-  def followings
+  def followings #フォロー一覧表示
     @user = User.find(params[:id])
     @pagy, @followings = pagy(@user.followings)
     counts(@user)
   end
+  
 
-  def followers
+  def likes #お気に入り一覧表示
     @user = User.find(params[:id])
-    @pagy, @followers = pagy(@user.followers)
+    @pagy, @likes = pagy(@user.favorites)
+    @fav_posts = current_user.fav_posts
     counts(@user)
+    
   end
   
   private
